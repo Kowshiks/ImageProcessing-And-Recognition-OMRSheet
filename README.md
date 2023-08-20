@@ -41,22 +41,3 @@ As a result the extracted answers are appended in a text file along with the que
 Though the above logic works most of the times correctly on images with answer boxes, if the boxes are very much slanting, that is if the pixel doesn’t follow almost 90 degrees for the lines along the boxes then the logic may not work that properly but still it should do some descent job. I carried out this particular logical implementation just because just type of answer sheet will always follow a straight line.
 
 The outputs are accurate to all the files except for the a-27.png file as the thresholds needs to be modified to make it more accurate to work with a-27.png which can be done by pixel level calculation to make it robust across all the images.
-
-## Correct Answer Encoding
-This part was designed and implemented by Brad Cooley. 
-### Part 1: Brain Storming
-Trying to figure out how to best encode the answers for the questions on the question sheet without a student reading them didn't seem like an overly difficult task at first. My mind immediately went to creating a QR code and placing it in the empty space below the 85th question. However, [after clarification on the problem](https://inscribe.education/main/indianau/6754110229501742/conversations/6749461749700332?searchText=barcode&backToListTab=search), it was revealed we would have to implement the QR code from scratch. Originally, this didn't sound overly difficult, but after watching a [video](https://www.youtube.com/watch?v=142TGhaTMtI) on how these barcodes are made, it seemed like overkill for this assignment. It also occurred to me that a simple QR code could be read by a student with a smartphone, therefore compromising the answers and the integrity of the exam. While, you could prohibit technology from a testing room, this still would only have one "layer" of security (the fact that it's a non-decipherable code to the human eye).
-
-I then moved to thinking about implementing my generic barcode that could be inserted on the bottom of the page because my research showed that the concept of a barcode was fairly simple. It also made sense to do this because most standardized tests use a barcode for some aspect of their grading. While seeing the best way to represent the answers and the data within the barcode, I generated a sample barcode just to see it's size; it was way too wide! Well shoot, this wasn't going to work, so I had to think of an approach that wasn't a catchall for an entire answer sheet.
-
-I now shifted my thinking to creating an element or barcode of some sort for every single question on the answer sheet. At first, I thought this wouldn't be possible as it would clutter the answer sheet too much, but I couldn't think of any other way to approach the problem. So, I went with it and started thinking of how I was going to fit some sort of uniquely identifiable object next to each question. My first thought was to create a Fourier Transformation and put that next to each question. One problem, the images that Fourier transformations produce tend to be incredibly complex and need more pixels than I had room for (roughly a 35 x 35 area). I then thought I would also have to implement some sort of character recognition algorithm to decipher the image after taking the inverse of the Fourier Transformation. At this point I was stumped, but my mind kept going back to some sort of QR code as that was square and could potentially fit into my area.
-
-I ran with the QR code idea, but mixing it with how a traditional barcode is interpreted. Basically, a dumbed down version of a QR code where each row of pixels was a binary representation of a character and I could just read row by row. I decided this idea was simple enough to try and hack a solution together for, so I began creating it.
-
-es with answer. Then we read all the pixel values from the image. 
-2. Check pixel values to determine binary representation.
-3. If our value string was an actual binary representation, add it to our values.
-4. Repeat the step 2 and 3 to deteremine answer from all three columns.
-5. After completing the above steps I stored all the values in an array.
-6. Then converted all the binary values back to string.
-7. Store these value in a single string then saved as a text file. 
