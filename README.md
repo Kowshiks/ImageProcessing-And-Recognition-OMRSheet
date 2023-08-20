@@ -1,7 +1,5 @@
 # Assignment 1: Image Processing and Recognition Basics
 
-#### Authors: Brad Cooley (bwcooley), Rishi Raj (risraj), and Kowshik Selvam (kselvam)
-
 ## Task 1: Extracting the Answers that Students have marked in Answer Sheet
 
 This part was completely designed and implemented by Kowshik Selvam.
@@ -55,87 +53,10 @@ I now shifted my thinking to creating an element or barcode of some sort for eve
 
 I ran with the QR code idea, but mixing it with how a traditional barcode is interpreted. Basically, a dumbed down version of a QR code where each row of pixels was a binary representation of a character and I could just read row by row. I decided this idea was simple enough to try and hack a solution together for, so I began creating it.
 
-### Part 2: Version 1.0
-I started with a simple 10 x 10 pixel grid where there was a one pixel boarder and each pixel represented one bit in a binary representation of the character of the question it was encoding. 
-
-![Version 1 Barcode](/report-images/v1-design.png)
-
-The reason I settled on a 10 x 10 grid was because each character could be represented with 8 bits and I would have a maximum of 8 characters in an answer (e.g. `52 ABCDE` has a length of `8`). That gives a length of 8 and then having a one pixel border all the way around the barcode would give us a 10 x 10 image.
-
-I started the design process using a pixel art web application (seen below) and started just playing around with what different barcodes would look like. I used a [ASCII to binary converter](https://www.rapidtables.com/convert/number/ascii-to-binary.html) to create each sample barcode.
-
-![Pixilart Project for Version 1 of the Barcode](/report-images/pixilart-project.png)
-
-It was convenient that each pixel represented a singular bit because it was really nice for representing in a 2D-array within the code. It was also really nice that the pixels had definite values (black, 0, represented the binary `1` while white, 255, represented the binary `0`, grey, 127, represented a border) as this helped the reading of the barcode tremendously.
-
-To recap, the general process and flow for creating the barcode went like this,
-
-- Read in an answer file as a text file
-- Clean the data and replace spaces with a `-` so that the barcode could look more contiguous
-    - Ex: `43 AB` was read and processed as `43-AB`
-- Convert the text representation of each answer to binary and store that in a 2D array where any indices up to 8 that were empty were filled with the null character (`00000000` in binary, `\0` as a string)
-- Create the barcode based off each array generated from the previous step
-- Save barcodes somewhere for future use
-
-I then moved onto how to properly read in this information so we could get the correct answer to a question. This process went like this,
-
-- Read in the barcode as an image
-- Use Pillow to convert the image to a 2D array
-- Parse each pixel, row by row, to generate a binary representation of the data in the barcode
-- Convert the binary representation to ASCII
-
-This was a great first version and worked very well when being read as a static image (i.e. not from a scanned image). However, as soon as I started to think about it, a singular pixel model left zero room for error or noise that was almost certainly going to be introduced once the image was scanned in. I had to rethink my approach a little bit.
-
-### Part 3: Version 1.1, a more robust solution
-To handle noise, stay within the boundaries of the area I had to work with, and not completely abandon my original idea, I just decided to make the barcode larger. This time, the borders were represented with a 2 pixels now and each bit was represented with a 3 x 3 box. This gives a 28 x 28 barcode (3 pixels per bit, 8 bits total, 4 pixels for borders). Below is version 1.1 divided into a 10 x 10 grid as to match version 1.0. You can see how the boarders are disproportional to each bit, signifying version 1.1.
-
-![Version 2 Grid](/report-images/answer-17-100x-grid.png)
-
-This keeps the same logic in place for generating and reading the barcode, just scaled up. This barcode also is able to handle noise better. A part of version 1.1 was to integrate some sort of error checking harness to disregard answer values larger than `E` and number values less than 1 and greater than 85.
-
-### Part 4: Injecting into an answer sheet
-This part was a little more difficult, and my implementation was just to prove that it could be done. I created an, admittedly hacky, solution to place the barcodes on a generated answer sheet. I say that it is hacky, because a lot of the placement aspects are based on fixed numbers and no computer vision techniques for finding the best placement for the barcodes.
-
-![Answer sheet with barcodes](/report-images/answer-sheet.png)
-
-### Part 5: Shortcomings
-While this is a really good start for solving this problem, the particular part of the solution has some shortcomings.
-
-First, it doesn't deal with noise *great*, just okay. I couldn't figure out the best way to tune my thresholds for looking at the binary. Ideally, some sort of error correcting code (Hamming codes, Reed-Solomon coding, etc.) would be used to try and best predict what the barcode was supposed to say. I studied some information theory during my undergrad, but never implemented anything in code. Based on the type of data here, we could use Hamming codes, but would have to add some extra bits to the end for our parity bits. While Hamming codes are a good simplistic algorithm for this error detection, Reed-Solomon codes would be better for robustness, but would require a different way of us structuring our data as they don't work with binary data streams.
-
-Second, my code for reading a barcode is very fixed and can't handle much in the way of size variance of the barcode. Ideally, we would just adjust our reading size to crop the barcode to the pixels immediately inside the borders and then read from there, but I couldn't get that working well.
-
-### Part 6: Closing remarks
-All in all, I feel the barcode system is one of the better and easier to understand for solving the problem presented to us. It's simple algorithmically (doesn't require massive amounts of computational power), easy to implement, and conceals the information to the end user in a fairly secure way. The benefits of this are that it's fairly safeguarded against most types of cheating as the only way a student could decode the answer would be to try and count pixels (my eyesight is *definitely* not that good) to decipher the binary.
-
-## Extracting Answers 
- 
-1. First we take the input from the injected files with answer. Then we read all the pixel values from the image. 
+es with answer. Then we read all the pixel values from the image. 
 2. Check pixel values to determine binary representation.
 3. If our value string was an actual binary representation, add it to our values.
 4. Repeat the step 2 and 3 to deteremine answer from all three columns.
 5. After completing the above steps I stored all the values in an array.
 6. Then converted all the binary values back to string.
 7. Store these value in a single string then saved as a text file. 
-
-
-Output of extraction for c-18:-
-
-![image](https://media.github.iu.edu/user/18399/files/5b5392d9-803c-4da5-92e2-0b99d27c77d2)
-
-
-Shortcomings:- 
-
-I wasn't able to get the answers in correct format for example 1 A then in next line 2 C. My output was like in the same line like 1 A 2 C.
-
-## Contributions of the Authors
-
-**Kowshik** designed and completely coded the grading task (Task 1) from identifying the answers to writing the answers into output file.
-
-**Brad** wrote all of the code for the barcode generation, reading, and injection into the answer sheet.
-
-**Rishi** wrote the code for extraction and took some help from reading function that **Brad** had written.
-
-## Credit
-
-Discussed a very high level approach to Task 1 with Aditi Gode.
