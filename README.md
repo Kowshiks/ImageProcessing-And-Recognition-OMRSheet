@@ -8,6 +8,10 @@ This part was completely designed and implemented by Kowshik Selvam.
 
 When I read the question for the task to extract the answers that the students have marked in the answer sheet, I straight away started thinking of various techniques using which I could find the boundaries of the Answer options (A, B, C, D, E) for each question. Since all the answer option in the answer sheet should follow a straight line, as in all the starting and ending line of the answer option box should fall in a straight line, I first thought of ways to get the straight lines along the boxes. Then once I get all the straight lines, I thought of extracting the correct option marked from the boxes which are covered by the lines. 
 
+#### Example of an OMR sheet:
+
+![Answer box frame length](a-27.jpg)
+
 ### Idea 1:
 
 The first idea that I implemented for Hough Transform. I did non maximum suppression to makes sure it forms only one line instead of various lines coupling together at a single point ( in our case the horizontal and vertical line of the box. Then I implemented Hough transform from scratch and first it took 19 min to give few lines along the answer options. It gave somewhat good result but it took a lot of time. So I tried optimizing the code to check for lines in only desired places and then I managed to get lines along horizontally and vertically in 7 min but the result was not quite good as there were many overlapping lines and I was not able to get any useful insights from the lines to further develop on it. I performed various pre processing on the image to get the lines by performing hough transform but I was able to get the desired output.
